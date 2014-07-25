@@ -57,12 +57,13 @@ def isfloat(element):
 #answers=regressionMatrix[0]
 #variance=regressionMatrix[9]
 #print(variance)
-'''
-experiments=[1,2,3,4,5,6,7,8]
+
+experiments=list(range(9))
+experiments=experiments[1:]
 answer=[20, 35, 7, 42, 36, 50, 45, 82]
 plt.figure(1)
-subplotInit(plt, 2,1,1, 'Experiment Number', 'Percent of XDC Cells', 'Distribution of Percent of XDC Cells', numExperiments=9, experiments=experiments, results=answer)
-subplotInit(plt, 2,1,2, 'Experiment Number', 'Percent of XDC Cells', 'Distribution of Percent of XDC Cells', numExperiments=9, experiments=experiments, results=answer)
+subplotInit(plt, 2,1,1, 'Experiment Number', 'Percent of XDC Cells', 'Distribution of Percent of XDC Cells', numExperiments=8, experiments=experiments, results=answer)
+subplotInit(plt, 2,1,2, 'Experiment Number', 'Percent of XDC Cells', 'Distribution of Percent of XDC Cells', numExperiments=8, experiments=experiments, results=answer)
 plt.show()
-'''
+
 
