@@ -66,7 +66,37 @@ class MainDialog(ttk.tkinter.Tk):
         self.createExperimentFrame.pack_forget()
         self.makeCreateExperimentFrame(Shown=False)
         self.makeInitExperimentFrame(Shown=True)
-    
+    def linRegressExperiment(self):
+        self.title("Fitting data...")
+        try:
+            experimentOp=ExperimentOperator()
+            fName=(self.folderName.get())
+            exName=self.experimentName.get()
+            fullFileName= (fName + '/' + exName +'-' + self.experimentType.get() + '.csv')
+            experimentOp.readExperimentFromCSV(self.experiment, fullFileName)
+            i=0
+            while(i<len(self.experiment.results)):
+                if(i<len(self.experiment.factorWeights)):
+                    print("This Weight is already done")
+                    i=i+1
+                if(i>=len(self.experiment.factorWeights)):
+                    experimentOp.linearRegression(i, self.experiment)
+                i=i+1
+            experimentOp.writeExperimentToCSV(self.experiment, fullFileName)
+        except:
+            experimentOp=ExperimentOperator()
+            fName=(self.folderName.get())
+            exName=self.experimentName.get()
+            fullFileName= (fName + '/' + exName +'-' + self.experimentType.get() + '.csv')
+            i=0
+            while(i<len(self.experiment.results)):
+                if(i<len(self.experiment.factorWeights)):
+                    print("This Weight is already done")
+                    i=i+1
+                if(i>=len(self.experiment.factorWeights)):
+                    experimentOp.linearRegression(i, self.experiment)
+                i=i+1
+            experimentOp.writeExperimentToCSV(self.experiment, fullFileName)
     def goToCreateExperiment(self):
         #self.initExperimentFrame=self.makeInitExperimentFrame(Shown=False)
         self.initExperimentFrame.pack_forget()
@@ -80,12 +110,20 @@ class MainDialog(ttk.tkinter.Tk):
         experimentOp.readExperimentFromCSV(self.experiment, fullFileName)
         self.title("Design of Experiments: Experiment Analysis")
     def graphExperiment(self):
-        self.getExperimentResults()
-        experimentOp=ExperimentOperator()
-        if(self.graphType.get()=="Distribution" ):
-            experimentOp.graphExperimentDistribution(self.experiment)
-        elif(self.graphType.get()=="Factor Significance"):
-            experimentOp.graphExperimentFactorSignificance(self.experiment)
+        
+        try:
+            experimentOp=ExperimentOperator()
+            if(self.graphType.get()=="Distribution" ):
+                experimentOp.graphExperimentDistribution(self.experiment)
+            elif(self.graphType.get()=="Factor Significance"):
+                experimentOp.graphExperimentFactorSignificance(self.experiment)
+        except:
+            self.getExperimentResults()
+            experimentOp=ExperimentOperator()
+            if(self.graphType.get()=="Distribution" ):
+                experimentOp.graphExperimentDistribution(self.experiment)
+            elif(self.graphType.get()=="Factor Significance"):
+                experimentOp.graphExperimentFactorSignificance(self.experiment)
     def initExperiment(self):
         if(self.experimentType.get()== '2 Level Fractional Factorial'):
             fName=(self.folderName.get())
@@ -117,10 +155,11 @@ class MainDialog(ttk.tkinter.Tk):
             experimentOp.writeExperimentToCSV(experiment, fullFileName )
             
     def makeInitExperimentFrame(self, Shown=False):
+        self.initExperimentFrame=ttk.Frame()
         if(Shown==True and self.loadExperiment.get()=='Create New Experiment'):
             self.title("Design of Experiments: Initialize Fractional Factorial")
             self.geometry("650x450+350+350")  
-            if(self.experimentType.get()=='2 Level Fractional Factorial'):
+            if(self.experimentType.get()=='2 Level Fractional Factorial' and self.loadExperiment.get()=='Create New Experiment'):
                 
                 Label(self.initExperimentFrame, text="Choose Number of Factors: ", font=(12)).grid(column=2, row=2, padx=10, pady=10)
                 self.initExperimentFrame.factorSpin=Spinbox(self.initExperimentFrame, textvariable=self.numFactors, from_ = 5, to = 15)
@@ -130,10 +169,11 @@ class MainDialog(ttk.tkinter.Tk):
                 self.initExperimentFrame.experimentBox['values'] = self.fracFactRunList
                 self.initExperimentFrame.experimentBox.current(0)
                 self.initExperimentFrame.experimentBox.grid(column=3, row=4)
-            elif(self.experimentType.get()=='Central Composite Design'):
+            elif(self.experimentType.get()=='Central Composite Design' and self.loadExperiment.get()=='Create New Experiment'):
                 Label(self.initExperimentFrame, text="Choose Number of Factors: ", font=(12)).grid(column=2, row=2, padx=10, pady=10)
                 self.initExperimentFrame.factorSpin=Spinbox(self.initExperimentFrame, textvariable=self.numFactors, from_ = 2, to = 15)
                 self.initExperimentFrame.factorSpin.grid(column=3, row=2)
+            
             Label(self.initExperimentFrame, text="Choose Experiment Name: ", font=(12)).grid(column=2, row=1, padx=10, pady=10)  
             self.initExperimentFrame.entryValue=Entry(self.initExperimentFrame, textvariable=self.experimentName)
             self.initExperimentFrame.entryValue.grid(column=3, row=1)
@@ -154,10 +194,12 @@ class MainDialog(ttk.tkinter.Tk):
             self.initExperimentFrame.cancelButton= Button(self.initExperimentFrame, text="Cancel", command=self.quit)
             self.initExperimentFrame.cancelButton.grid(column=4, row=8, padx=5)
             self.initExperimentFrame.pack()
-        if(Shown==True and self.loadExperiment.get()== 'Load Previous Experiment'):
+        elif(Shown==True and self.loadExperiment.get()== 'Load Previous Experiment'):
             self.title("Design of Experiments: Experiment Analysis")
             self.geometry("650x450+350+350")
-            
+            Label(self.initExperimentFrame, text="Experiment Name: ", font=(12)).grid(column=2, row=2, padx=10, pady=10)  
+            self.initExperimentFrame.entryValue=Entry(self.initExperimentFrame, textvariable=self.experimentName)
+            self.initExperimentFrame.entryValue.grid(column=3, row=2)
             self.initExperimentFrame.resultsButton= Button(self.initExperimentFrame, text="Get Results", command = self.getExperimentResults)
             self.initExperimentFrame.resultsButton.grid(column=5, row=2, padx=5, pady=5)
             
@@ -175,7 +217,7 @@ class MainDialog(ttk.tkinter.Tk):
             self.initExperimentFrame.regressfitBox['values'] = self.fitList
             self.initExperimentFrame.regressfitBox.current(0)
             self.initExperimentFrame.regressfitBox.grid(column=3, row=4, padx=5, pady=5)
-            self.initExperimentFrame.regressfitButton= Button(self.initExperimentFrame, text="Fit Data", command = self.initExperiment)
+            self.initExperimentFrame.regressfitButton= Button(self.initExperimentFrame, text="Fit Data", command = self.linRegressExperiment)
             self.initExperimentFrame.regressfitButton.grid(column=5, row=4, padx=5, pady=5)
             
             self.initExperimentFrame.finishButton= Button(self.initExperimentFrame, text="Finish", command = self.initExperiment)
