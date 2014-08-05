@@ -16,6 +16,7 @@ class MainDialog(ttk.tkinter.Tk):
         self.experimentName=StringVar()
         self.experimentType=StringVar()
         self.listFactors= StringVar()
+        self.listFixedFactors=StringVar()
         self.listResults= StringVar()
         self.factorLows=StringVar()
         self.factorHighs=StringVar()
@@ -23,9 +24,9 @@ class MainDialog(ttk.tkinter.Tk):
         self.factorGenerator=StringVar()
         self.listSignificantFactors=[]
         self.listFactorWeights=[]
-        self.fracFactRunList=["5 Factor Design(16 Runs and Resolution V)", "9 Factor Design (32 Runs and Resolution IV)"]
+        self.fracFactRunList=["5 Factor Design(16 Runs and Resolution V)","6 Factor Design(16 Runs and Resolution IV)", "9 Factor Design (32 Runs and Resolution IV)"]
         self.centralCompositeDesignGeneratorDict={5:'a b c d abcd'}
-        self.fractFactGeneratorDict = {("5 Factor Design(16 Runs and Resolution V)"):'a b c d abcd', "9 Factor Design (32 Runs and Resolution IV)": 'a b c d e bcde acde abde abce'}
+        self.fractFactGeneratorDict = {("5 Factor Design(16 Runs and Resolution V)"):'a b c d abcd',"6 Factor Design(16 Runs and Resolution IV)":'a b c d abc bcd', "9 Factor Design (32 Runs and Resolution IV)": 'a b c d e bcde acde abde abce'}
         
         self.experiment=Experiment()
         self.graphList=["Distribution", "Factor Significance"]
@@ -133,7 +134,8 @@ class MainDialog(ttk.tkinter.Tk):
             factorLows=  list([self.factorLows.get()] * int(self.numFactors.get()))
             factorHighs= list([self.factorHighs.get()] * int(self.numFactors.get()))
             generatorList= str(self.fractFactGeneratorDict[self.factorGenerator.get()])
-            experiment=Experiment(factorList=factorList, factorHighs=factorHighs, factorLows=factorLows, generatorList=generatorList)
+            fixedVariables= list((self.listFixedFactors.get()).split(','))
+            experiment=Experiment(factorList=factorList, fixedVariables=fixedVariables, factorHighs=factorHighs, factorLows=factorLows, generatorList=generatorList)
             experimentOp=ExperimentOperator()
             experimentOp.setRunTable(experiment)
             experimentOp.writeExperimentToCSV(experiment, fullFileName )
@@ -177,7 +179,7 @@ class MainDialog(ttk.tkinter.Tk):
             Label(self.initExperimentFrame, text="Choose Experiment Name: ", font=(12)).grid(column=2, row=1, padx=10, pady=10)  
             self.initExperimentFrame.entryValue=Entry(self.initExperimentFrame, textvariable=self.experimentName)
             self.initExperimentFrame.entryValue.grid(column=3, row=1)
-            Label(self.initExperimentFrame, text="List Variables: ", font=(12)).grid(column=2, row=3, padx=10, pady=10)  
+            Label(self.initExperimentFrame, text="List Variables:(separated by ',')", font=(12)).grid(column=2, row=3, padx=10, pady=10)  
             self.initExperimentFrame.entryValue=Entry(self.initExperimentFrame, textvariable=self.listFactors)
             self.initExperimentFrame.entryValue.grid(column=3, row=3)
             Label(self.initExperimentFrame, text="Choose Factor Low: ", font=(12)).grid(column=2, row=5, padx=10, pady=10)
@@ -186,13 +188,16 @@ class MainDialog(ttk.tkinter.Tk):
             Label(self.initExperimentFrame, text="Choose Factor High: ", font=(12)).grid(column=2, row=6, padx=10, pady=10)
             self.initExperimentFrame.factorHighSpin=Spinbox(self.initExperimentFrame, textvariable=self.factorHighs, from_ = 0, to = 100)
             self.initExperimentFrame.factorHighSpin.grid(column=3, row=6)
+            Label(self.initExperimentFrame, text="List Fixed Variables: ", font=(12)).grid(column=2, row=7, padx=10, pady=10)  
+            self.initExperimentFrame.entryFixedValue=Entry(self.initExperimentFrame, textvariable=self.listFixedFactors)
+            self.initExperimentFrame.entryFixedValue.grid(column=3, row=7)
             
             self.initExperimentFrame.nextButton= Button(self.initExperimentFrame, text="Execute", command = self.initExperiment)
-            self.initExperimentFrame.nextButton.grid(column=6, row=8, padx=5)
+            self.initExperimentFrame.nextButton.grid(column=6, row=9, padx=5)
             self.initExperimentFrame.backButton= Button(self.initExperimentFrame, text="Back", command=self.goToCreateExperiment)
-            self.initExperimentFrame.backButton.grid(column=5, row=8, padx=5)
+            self.initExperimentFrame.backButton.grid(column=5, row=9, padx=5)
             self.initExperimentFrame.cancelButton= Button(self.initExperimentFrame, text="Cancel", command=self.quit)
-            self.initExperimentFrame.cancelButton.grid(column=4, row=8, padx=5)
+            self.initExperimentFrame.cancelButton.grid(column=4, row=9, padx=5)
             self.initExperimentFrame.pack()
         elif(Shown==True and self.loadExperiment.get()== 'Load Previous Experiment'):
             self.title("Design of Experiments: Experiment Analysis")

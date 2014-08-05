@@ -19,7 +19,7 @@ class Experiment(object):
     '''
     classdocs
     '''
-    def __init__(self, runTable=[], factorList=[], factorHighs=[], factorLows=[], results=[], generatorList='', numExperiments=[], factorWeights=[], factorPvals=[], independentVariableList=[] ):
+    def __init__(self, runTable=[], factorList=[], fixedVariables=[], factorHighs=[], factorLows=[], results=[], generatorList='', numExperiments=[], factorWeights=[], factorPvals=[], independentVariableList=[] ):
         '''
         Constructor
         '''
@@ -28,6 +28,7 @@ class Experiment(object):
         self.factorLows=factorLows
         self.runTable= runTable
         self.results=results
+        self.fixedVariables=fixedVariables
         self.generatorList=generatorList
         self.numExperiments=[]
         self.factorNum=len(self.factorList)
@@ -72,6 +73,7 @@ class ExperimentOperator:
     def createExperimentTable(self, experiment):
         completeMatrix=[]
         factorRow=(experiment.factorList)
+        factorRow.extend(experiment.fixedVariables)
         if(experiment.factorList[0]!='Factor Names'):
             factorRow.insert(0, 'Factor Names')
         
@@ -116,6 +118,7 @@ class ExperimentOperator:
             runTableRow=runTableRow.replace('  ',',')
             runTableRow=runTableRow.replace('-',',-')
             runTableRow=list(runTableRow.split(','))
+            runTableRow.extend(list(['1.']*len(experiment.fixedVariables)))
             print(runTableRow)
             k=0
             while k<len(runTableRow):
